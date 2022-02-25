@@ -147,7 +147,7 @@ void tempShow(){
   int tempHigh = 21;
   if (tempRef < 19){
     tempRef = tempBMP;
-    if (tempRef < tempMin) tempRef = 16;
+    if (tempRef < 16) tempRef = 16;
     tempB = map(tempRef*10, 16*10, 19*10, 255, 0);
     tempG = map(tempRef*10, 16*10, 19*10, 0, 255);
     fill_solid(leds, NUM_LEDS, CRGB(0, tempG, tempB));
