@@ -43,8 +43,8 @@ char auth[] = BLYNK_AUTH_TOKEN;
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "dein wlan name";
-char pass[] = "dein Wlan passwort";
+char ssid[] = "PRECELERATOR_VR_CLUSTER";
+char pass[] = "PreceleratorSCE.Cluster";
 
 uint8_t LED_R = 0;
 uint8_t LED_G = 0;
@@ -53,6 +53,8 @@ int pinValue = 0;
 bool tempRGB = false;
 bool tempFeed = false;
 double tempBMP = 0;
+int sendInterval = 1000;
+int millisOld = 0;
 CRGB leds[NUM_LEDS];
 
 BlynkTimer timer;
@@ -141,11 +143,13 @@ void tempShow(){
   int tempR;
   int tempG;
   int tempB;
+  int tempMin = 19;
+  int tempHigh = 21;
   if (tempRef < 19){
     tempRef = tempBMP;
-    if (tempRef < 16) tempRef = 16;
-    tempB = map(tempRef, 16, 19, 255, 0);
-    tempG = map(tempRef, 16, 19, 0, 255);
+    if (tempRef < tempMin) tempRef = 16;
+    tempB = map(tempRef*10, 16*10, 19*10, 255, 0);
+    tempG = map(tempRef*10, 16*10, 19*10, 0, 255);
     fill_solid(leds, NUM_LEDS, CRGB(0, tempG, tempB));
     FastLED.show();
   }
@@ -153,11 +157,11 @@ void tempShow(){
     fill_solid(leds, NUM_LEDS, CRGB(0, 255, 0));
     FastLED.show();
   }
-  if (tempRef >= 21){
+  if (tempRef >= tempHigh){
     tempRef = tempBMP;
     if (tempRef > 23) tempRef = 23;
-    tempR = map(tempRef, 21, 23, 0, 255);
-    tempG = map(tempRef, 21, 23, 255, 0);
+    tempR = map(tempRef*10, 21*10, 23*10, 0, 255);
+    tempG = map(tempRef*10, 21*10, 23*10, 255, 0);
     fill_solid(leds, NUM_LEDS, CRGB(tempR, tempG, 0));
     FastLED.show();
   }
@@ -200,7 +204,7 @@ void setup()
 
   // Setup a function to be called every second
   timer.setInterval(1000L, myTimerEvent);
-  timer_Temp.setInterval(10000L, sendTemp);
+  timer_Temp.setInterval(1000L, sendTemp);
   
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
   if (!bme.begin(0x76)) { 
@@ -223,7 +227,11 @@ void setup()
 }
 
 void loop()
-{
+{ 
+  if ( (millis()-millisOld) > sendInterval){
+    tempBMP = bme.readTemperature();
+    millisOld = millis();
+  }                                                                                                                    
   Blynk.run();
   timer.run();
   timer_Temp.run();
