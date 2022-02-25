@@ -43,8 +43,8 @@ char auth[] = BLYNK_AUTH_TOKEN;
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "RapsiWetter";
-char pass[] = "!HelloVVorld2";
+char ssid[] = "dein wlan name";
+char pass[] = "dein Wlan passwort";
 
 uint8_t LED_R = 0;
 uint8_t LED_G = 0;
